@@ -2,16 +2,16 @@ import tweepy
 import urllib.request
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 import os
+from os import environ
 import time
 
 
 def setup_api():
-    API_KEY = 'REMOVED'
-    API_SECRET_KEY = 'REMOVED'
-    ACCESS_TOKEN = 'REMOVED'
-    ACCESS_TOKEN_SECRET = 'REMOVED'
+    API_KEY = environ['CONSUMER_KEY']
+    API_SECRET_KEY = environ['CONSUMER_SECRET']
+    ACCESS_TOKEN = environ['ACCESS_KEY']
+    ACCESS_TOKEN_SECRET = environ['ACCESS_SECRET']
 
     auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -77,4 +77,4 @@ while(True):
         with open('last_id', 'w+') as file:
             file.write(str(last_id))
     
-    time.sleep(18000)
+    time.sleep(3600)
