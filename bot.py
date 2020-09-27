@@ -39,6 +39,8 @@ def process_image(img):
 
         mask_rescaled = cv2.resize(mask, (w_mouth, h_mouth), interpolation = cv2.INTER_AREA)
         
+        if(y_mouth+h_mouth > img.shape[0] or x_mouth+w_mouth > img.shape[1]):
+            return
         img[y_mouth:y_mouth+h_mouth, x_mouth:x_mouth+w_mouth][mask_rescaled != [255, 255, 255]] = mask_rescaled[mask_rescaled != [255, 255, 255]]
         
     return img
@@ -55,9 +57,9 @@ def reply_mention(mention):
                     img = cv2.imdecode(arr, -1) # 'Load it as it is'
                     new_img = process_image(img)
                 filename = "tmp/{}.png".format(mention.id)
-                cv2.imwrite(filename, new_img)
-                api.update_with_media(filename, status='', in_reply_to_status_id=mention.id, auto_populate_reply_metadata=True)
-                os.remove(filename)
+                #cv2.imwrite(filename, new_img)
+                #api.update_with_media(filename, status='', in_reply_to_status_id=mention.id, auto_populate_reply_metadata=True)
+                #os.remove(filename)
                 return
 
 api = setup_api()
@@ -69,15 +71,16 @@ while(True):
     print("Retrieving tweets...")
 
     if (last_id != ''):
-        mentions = api.mentions_timeline(last_id, tweet_mode='extended')
+        mentions = api.mentions_timeline(last_id, tweet_mode='extended', count=5)
     else :
-        mentions = api.mentions_timeline(tweet_mode='extended')
+        mentions = api.mentions_timeline(tweet_mode='extended', count=5)
     
     for mention in reversed(mentions):
+        print(mention.id)
         reply_mention(mention)
 
         last_id = mention.id
         with open('last_id', 'w+') as file:
             file.write(str(last_id))
      
-    time.sleep(60)
+    time.sleep(5)
