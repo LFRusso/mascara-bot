@@ -81,6 +81,7 @@ while(True):
 
         last_id = mention.id
         with open('last_id', 'w+') as file:
+            print("writing")
             file.write(str(last_id))
      
     time.sleep(5)
