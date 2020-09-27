@@ -1,0 +1,1 @@
+Folder for temp image files.

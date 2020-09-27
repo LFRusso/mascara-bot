@@ -70,11 +70,11 @@ while(True):
     else :
         mentions = api.mentions_timeline(tweet_mode='extended')
 
-    for mention in mentions:
+    for mention in reversed(mentions):
         reply_mention(mention)
 
         last_id = mention.id
         with open('last_id', 'w+') as file:
             file.write(str(last_id))
     
-    time.sleep(3600)
+    time.sleep(60)
