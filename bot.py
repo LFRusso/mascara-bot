@@ -61,20 +61,23 @@ def reply_mention(mention):
                 return
 
 api = setup_api()
+
+with open('last_id', 'r+') as file:
+    last_id = file.readline()
+
 while(True):
-    with open('last_id', 'r') as file:
-        last_id = file.readline()
+    print("Retrieving tweets...")
 
     if (last_id != ''):
         mentions = api.mentions_timeline(last_id, tweet_mode='extended')
     else :
         mentions = api.mentions_timeline(tweet_mode='extended')
-
+    
     for mention in reversed(mentions):
         reply_mention(mention)
 
         last_id = mention.id
         with open('last_id', 'w+') as file:
             file.write(str(last_id))
-    
+     
     time.sleep(60)
