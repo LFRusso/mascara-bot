@@ -83,17 +83,12 @@ def reply_mention(mention):
 
 api = setup_api()
 download_from_s3('last_id')
-time.sleep(10)
 with open('last_id') as file:
     last_id = file.readline()
 
+i=0
 while(True):
-    print("Retrieving tweets...")
-
-    if (last_id != ''):
-        mentions = api.mentions_timeline(last_id, tweet_mode='extended', count=5)
-    else :
-        mentions = api.mentions_timeline(tweet_mode='extended', count=5)
+    mentions = api.mentions_timeline(last_id, tweet_mode='extended', count=5)
     
     for mention in reversed(mentions):
         reply_mention(mention)
@@ -101,6 +96,11 @@ while(True):
         last_id = mention.id
         with open('last_id', 'w+') as file:
             file.write(str(last_id))
+        
+
+    # Saving data to AWS S3
+    if(i%10 == 0):
         upload_to_s3('last_id')
-     
-    time.sleep(60)
+    i+=1
+
+    time.sleep(600)
