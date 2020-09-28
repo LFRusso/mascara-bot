@@ -76,9 +76,9 @@ def reply_mention(mention):
                     img = cv2.imdecode(arr, -1) # 'Load it as it is'
                     new_img = process_image(img)
                 filename = "tmp/{}.png".format(mention.id)
-                #cv2.imwrite(filename, new_img)
-                #api.update_with_media(filename, status='', in_reply_to_status_id=mention.id, auto_populate_reply_metadata=True)
-                #os.remove(filename)
+                cv2.imwrite(filename, new_img)
+                api.update_with_media(filename, status='', in_reply_to_status_id=mention.id, auto_populate_reply_metadata=True)
+                os.remove(filename)
                 return
 
 api = setup_api()
@@ -87,7 +87,6 @@ time.sleep(10)
 with open('last_id') as file:
     last_id = file.readline()
 
-print(last_id)
 while(True):
     print("Retrieving tweets...")
 
@@ -104,4 +103,4 @@ while(True):
             file.write(str(last_id))
         upload_to_s3('last_id')
      
-    time.sleep(5)
+    time.sleep(60)
