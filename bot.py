@@ -1,4 +1,5 @@
 import tweepy
+import boto3
 import urllib.request
 import numpy as np
 import cv2
@@ -17,6 +18,24 @@ def setup_api():
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     api = tweepy.API(auth)
     return api
+
+def upload_to_s3(filename):
+    S3_BUCKET = environ['S3_BUCKET']
+    AWS_ACCESS_KEY_ID= environ['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = environ['AWS_SECRET_ACCESS_KEY']
+    
+    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    s3.upload_file(Filename=filename, Bucket=S3_BUCKET, Key=filename)
+    return
+
+def download_from_s3(filename):
+    S3_BUCKET = environ['S3_BUCKET']
+    AWS_ACCESS_KEY_ID= environ['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = environ['AWS_SECRET_ACCESS_KEY']
+    
+    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    s3.download_file(Filename=filename, Bucket=S3_BUCKET, Key=filename)
+    return
 
 
 def process_image(img):
@@ -63,10 +82,12 @@ def reply_mention(mention):
                 return
 
 api = setup_api()
-
-with open('last_id', 'r+') as file:
+download_from_s3('last_id')
+time.sleep(10)
+with open('last_id') as file:
     last_id = file.readline()
 
+print(last_id)
 while(True):
     print("Retrieving tweets...")
 
@@ -76,12 +97,11 @@ while(True):
         mentions = api.mentions_timeline(tweet_mode='extended', count=5)
     
     for mention in reversed(mentions):
-        print(mention.id)
         reply_mention(mention)
 
         last_id = mention.id
         with open('last_id', 'w+') as file:
-            print("writing")
             file.write(str(last_id))
+        upload_to_s3('last_id')
      
     time.sleep(5)
